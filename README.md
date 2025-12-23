@@ -17,10 +17,12 @@ All mappings are customizable in `keymapping.h`.
 
 ## Requirements
 
-- macOS 14+ (tested on macOS 15)
+- Should work with new versions of macOS (tested on macOS Tahoe 26.1)
 - Xbox One controller with USB cable (Model 1697 confirmed working)
 - Homebrew, libusb, pkg-config
 - Xcode command line tools
+
+* Note: other controller models and versions of macOS may cause issues.
 
 ## Installation
 
@@ -36,13 +38,12 @@ make simulator
 sudo ./simulator
 ```
 
-**Important:** macOS requires Accessibility permissions for keyboard/mouse injection. After running once, go to System Settings → Privacy & Security → Accessibility and add your terminal app.
+**Important:** macOS requires Accessibility permissions for keyboard/mouse injection. After running once, go to System Settings → Privacy & Security → Accessibility and add your terminal app if not there already.
 
 ## Customization
 
 Edit `keymapping.h` to change button mappings, stick behavior, mouse sensitivity, or deadzone. Every setting is documented in that file. After changes, rebuild with `make simulator`.
 
-Common customizations:
 - Change what buttons do (e.g., A button = Enter instead of Space)
 - Adjust mouse sensitivity/deadzone
 - Switch stick modes (WASD, arrows, mouse, or disabled)
@@ -59,12 +60,11 @@ The controller sends input packets at ~100Hz. We apply deadzones, convert analog
 
 ## Limitations
 
-- **USB only** - wireless adapter not supported
 - **Model 1697 tested** - other Xbox One controllers may have different packet formats
 - **No force feedback** - rumble not implemented
-- **Requires sudo** - needed for USB device access
 - **Accessibility permissions required** - macOS security restriction
-- **Not a virtual gamepad** - apps must accept keyboard/mouse (most games do)
+- **Not a virtual gamepad** - simulates keyboard/mouse inputs
+- **Requires sudo** - needed for USB device access
 
 ## Files
 
@@ -75,7 +75,7 @@ The controller sends input packets at ~100Hz. We apply deadzones, convert analog
 - `phase2_usb_test.c` - USB diagnostics
 - `hid_descriptor.h` - HID descriptor (reference)
 
-## Testing without keyboard/mouse
+## Testing without keyboard/mouse virtualization
 
 If you want to see raw controller input without keyboard/mouse injection:
 
@@ -85,8 +85,6 @@ sudo ./xbox_gip_test
 ```
 
 ## Troubleshooting
-
-**Controller not found:** Make sure it's plugged in, run with sudo, try different USB ports.
 
 **Keys not working:** Check Accessibility permissions in System Settings. Your terminal must be in the allowed apps list.
 
@@ -100,10 +98,17 @@ sudo ./xbox_gip_test
 - Controller must be plugged in before starting the program
 - No hot-plug detection (restart program if you unplug/replug)
 
+## Why keyboard/mouse instead of a virtual controller?
+The ideal solution would be creating a virtual HID gamepad that macOS sees as a real controller. Unfortunately, recent macOS versions block userspace programs from creating virtual HID devices as a security measure. Kernel extensions (kexts) could work around this, but Apple deprecated those and now requires onerous signing/notarization processes.
+
+Keyboard and mouse emulation works because macOS allows it through the Accessibility API (originally designed for assistive technology). It's not perfect—you lose analog precision and can't use the controller in apps that only support gamepads—but it works in most games and apps since they accept keyboard/mouse input anyway.
+
+This is why the driver can read every button press perfectly but has to convert analog sticks to WASD keys and mouse movement.
+
 ## Credits
 
 Reverse-engineered from Linux xpad/xow drivers and Microsoft GIP documentation. Protocol packet structure figured out through USB captures and trial-and-error.
 
 ## License
 
-MIT
+MIT License
