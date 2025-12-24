@@ -90,6 +90,7 @@ typedef struct {
     TriggerMapping triggers;
     
     bool console_output_enabled;      // Default: true (show input in console)
+    bool streaming_mode;              // Default: false (true for Moonlight/Parsec)
 } ControllerMapping;
 
 // ============================================================================
@@ -144,7 +145,8 @@ static inline ControllerMapping get_default_mapping(void) {
             .threshold = 127
         },
         
-        .console_output_enabled = true
+        .console_output_enabled = true,
+        .streaming_mode = false
     };
     
     return mapping;

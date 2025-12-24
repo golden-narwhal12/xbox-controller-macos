@@ -1,6 +1,6 @@
 # Xbox One Controller Driver for macOS
 
-A userspace driver for Xbox One controllers that translates controller input to keyboard and mouse events. Built from scratch using reverse-engineered GIP protocol.
+A userspace driver for Xbox One controllers that translates controller input to keyboard and mouse events. Built from scratch using reverse-engineered GIP protocol. This driver can be used for game streaming (read below).
 
 ## What it does
 
@@ -21,8 +21,6 @@ All mappings are customizable in `keymapping.h`.
 - Xbox One controller with USB cable (Model 1697 confirmed working)
 - Homebrew, libusb, pkg-config
 - Xcode command line tools
-
-* Note: other controller models and versions of macOS may cause issues.
 
 ## Installation
 
@@ -48,6 +46,10 @@ Edit `keymapping.h` to change button mappings, stick behavior, mouse sensitivity
 - Adjust mouse sensitivity/deadzone
 - Switch stick modes (WASD, arrows, mouse, or disabled)
 - Change trigger behavior (mouse buttons or keys)
+
+## For game streaming 
+
+If you want to use this driver while game streaming, please change variable "streaming_mode" on line 149 of the keymapping.h file to "true" and rebuild the program. (run make clean and make simulator). 
 
 ## How it works
 

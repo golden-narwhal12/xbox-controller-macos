@@ -85,8 +85,8 @@ void send_mouse_button_event(CGMouseButton button, bool pressed) {
 }
 
 void send_mouse_movement(float dx, float dy) {
-    if (fabs(dx) < 0.1 && fabs(dy) < 0.1) {
-        return; // Too small to matter
+    if (dx == 0.0f && dy == 0.0f) {
+        return;
     }
     
     CGPoint currentPos;
@@ -94,9 +94,21 @@ void send_mouse_movement(float dx, float dy) {
     currentPos = CGEventGetLocation(getPos);
     CFRelease(getPos);
     
-    CGPoint newPos = CGPointMake(currentPos.x + dx, currentPos.y + dy);
+    CGEventRef event;
     
-    CGEventRef event = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, newPos, 0);
+    if (config.streaming_mode) {
+        // Streaming mode: Use delta fields (for Moonlight, Parsec, etc.)
+        event = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, currentPos, 0);
+        if (event) {
+            CGEventSetIntegerValueField(event, kCGMouseEventDeltaX, (int64_t)dx);
+            CGEventSetIntegerValueField(event, kCGMouseEventDeltaY, (int64_t)dy);
+        }
+    } else {
+        // Local mode: Use absolute positioning (for native macOS apps)
+        CGPoint newPos = CGPointMake(currentPos.x + dx, currentPos.y + dy);
+        event = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, newPos, 0);
+    }
+    
     if (event) {
         CGEventPost(kCGHIDEventTap, event);
         CFRelease(event);
