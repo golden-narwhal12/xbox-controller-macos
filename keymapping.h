@@ -1,8 +1,21 @@
-// keymapping.h
-// Xbox Controller to Keyboard/Mouse Mapping Configuration
-// 
-// CUSTOMIZATION: Edit the values in this file to change your controller bindings
-// Key codes are from Carbon/HIToolbox (standard macOS key codes)
+/*******************************************************************************
+ * XBOX CONTROLLER CONFIGURATION FILE
+ * 
+ * This is the ONLY file you need to edit to customize your controller!
+ * 
+ * HOW TO USE:
+ * 1. Find the section you want to customize below (buttons, sticks, triggers)
+ * 2. Change the values using the key code reference at the bottom
+ * 3. Save this file
+ * 4. Rebuild: make simulator
+ * 5. Run: sudo ./simulator
+ * 
+ * QUICK EXAMPLES:
+ * - Change A button from Space to Enter:  key_a = 0x24 (instead of 0x31)
+ * - Swap left stick to arrows:  left_stick_mode = STICK_MODE_ARROWS
+ * - Make triggers keys instead of mouse clicks:  left_trigger_mode = TRIGGER_MODE_KEY
+ * 
+ ******************************************************************************/
 
 #ifndef KEYMAPPING_H
 #define KEYMAPPING_H
@@ -10,178 +23,379 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-// ============================================================================
-// CUSTOMIZATION SECTION - Edit these values to change your bindings!
-// ============================================================================
-
-// Button to Key Mappings
-// Key codes: https://eastmanreference.com/complete-list-of-applescript-key-codes
-typedef struct {
-    uint16_t key_a;              // Default: Space (0x31)
-    uint16_t key_b;              // Default: C (0x08)
-    uint16_t key_x;              // Default: R (0x0F)
-    uint16_t key_y;              // Default: F (0x03)
-    uint16_t key_lb;             // Default: Q (0x0C)
-    uint16_t key_rb;             // Default: E (0x0E)
-    uint16_t key_ls;             // Default: Left Shift (0x38)
-    uint16_t key_rs;             // Default: Left Ctrl (0x3B)
-    uint16_t key_view;           // Default: Tab (0x30)
-    uint16_t key_menu;           // Default: Escape (0x35)
-    uint16_t key_dpad_up;        // Default: Up Arrow (0x7E)
-    uint16_t key_dpad_down;      // Default: Down Arrow (0x7D)
-    uint16_t key_dpad_left;      // Default: Left Arrow (0x7B)
-    uint16_t key_dpad_right;     // Default: Right Arrow (0x7C)
-} ButtonMapping;
-
-// Stick behavior modes
+/*******************************************************************************
+ * SECTION 1: STICK BEHAVIOR
+ * 
+ * Choose how each analog stick behaves:
+ * - STICK_MODE_WASD:     Use stick as WASD keys (good for movement)
+ * - STICK_MODE_ARROWS:   Use stick as arrow keys
+ * - STICK_MODE_MOUSE:    Use stick to move mouse cursor (good for camera)
+ * - STICK_MODE_DISABLED: Turn off this stick
+ ******************************************************************************/
 typedef enum {
-    STICK_MODE_WASD,        // Convert to WASD keys
-    STICK_MODE_ARROWS,      // Convert to arrow keys
-    STICK_MODE_MOUSE,       // Convert to mouse movement
-    STICK_MODE_DISABLED     // Ignore this stick
+    STICK_MODE_WASD,
+    STICK_MODE_ARROWS,
+    STICK_MODE_MOUSE,
+    STICK_MODE_DISABLED
 } StickMode;
 
-// Trigger behavior modes
+/*******************************************************************************
+ * SECTION 2: TRIGGER BEHAVIOR
+ * 
+ * Choose how triggers behave:
+ * - TRIGGER_MODE_MOUSE: Trigger acts as mouse click (LT=left click, RT=right click)
+ * - TRIGGER_MODE_KEY:   Trigger acts as keyboard key (set key below)
+ * - TRIGGER_MODE_DISABLED: Turn off this trigger
+ ******************************************************************************/
 typedef enum {
-    TRIGGER_MODE_KEY,       // Act as a key press
-    TRIGGER_MODE_MOUSE,     // Act as mouse button
-    TRIGGER_MODE_DISABLED   // Ignore this trigger
+    TRIGGER_MODE_MOUSE,
+    TRIGGER_MODE_KEY,
+    TRIGGER_MODE_DISABLED
 } TriggerMode;
 
-// Stick to Key/Mouse Mappings
+/*******************************************************************************
+ * INTERNAL STRUCTURES (Don't modify these, edit the config below instead)
+ ******************************************************************************/
 typedef struct {
-    // Left stick configuration
-    StickMode left_stick_mode;   // Default: STICK_MODE_WASD
-    uint16_t left_up;            // Default: W (0x0D)
-    uint16_t left_down;          // Default: S (0x01)
-    uint16_t left_left;          // Default: A (0x00)
-    uint16_t left_right;         // Default: D (0x02)
+    uint16_t key_a, key_b, key_x, key_y;
+    uint16_t key_lb, key_rb;
+    uint16_t key_ls, key_rs;
+    uint16_t key_view, key_menu;
+    uint16_t key_dpad_up, key_dpad_down, key_dpad_left, key_dpad_right;
+} ButtonMapping;
+
+typedef struct {
+    StickMode left_stick_mode;
+    uint16_t left_up, left_down, left_left, left_right;
     
-    // Right stick configuration
-    StickMode right_stick_mode;  // Default: STICK_MODE_MOUSE
-    uint16_t right_up;           // Default: I (0x22) - only used if not MOUSE mode
-    uint16_t right_down;         // Default: K (0x28)
-    uint16_t right_left;         // Default: J (0x26)
-    uint16_t right_right;        // Default: L (0x25)
+    StickMode right_stick_mode;
+    uint16_t right_up, right_down, right_left, right_right;
     
-    // Mouse sensitivity (only for MOUSE mode)
-    float mouse_sensitivity;     // Default: 1.5
-    float mouse_curve;           // Default: 1.8 (exponential curve, 1.0=linear)
-    float mouse_smoothing;       // Default: 0.3 (0.0=no smoothing, 0.9=max smoothing)
-    
-    // Deadzone (0-32767, default: 8000 = ~24%)
+    float mouse_sensitivity;
+    float mouse_curve;
+    float mouse_smoothing;
     int16_t deadzone;
 } StickMapping;
 
-// Trigger Mappings
 typedef struct {
-    TriggerMode left_trigger_mode;    // Default: TRIGGER_MODE_MOUSE (left click)
-    TriggerMode right_trigger_mode;   // Default: TRIGGER_MODE_MOUSE (right click)
-    
-    uint16_t left_trigger_key;        // Default: Z (0x06) - only used in KEY mode
-    uint16_t right_trigger_key;       // Default: X (0x07) - only used in KEY mode
-    
-    uint8_t threshold;                // Default: 127 (50%)
+    TriggerMode left_trigger_mode;
+    TriggerMode right_trigger_mode;
+    uint16_t left_trigger_key;
+    uint16_t right_trigger_key;
+    uint8_t threshold;
 } TriggerMapping;
 
-// Complete mapping configuration
 typedef struct {
     ButtonMapping buttons;
     StickMapping sticks;
     TriggerMapping triggers;
-    
-    bool console_output_enabled;      // Default: true (show input in console)
-    bool streaming_mode;              // Default: false (true for Moonlight/Parsec)
+    bool console_output_enabled;
+    bool streaming_mode;
 } ControllerMapping;
 
-// ============================================================================
-// DEFAULT CONFIGURATION
-// ============================================================================
+/*******************************************************************************
+ * ============================================================================
+ *                    🎮 YOUR CONFIGURATION STARTS HERE 🎮
+ * ============================================================================
+ * 
+ * Edit the values below to customize your controller!
+ * Look up key codes in the reference at the bottom of this file.
+ * 
+ ******************************************************************************/
 
 static inline ControllerMapping get_default_mapping(void) {
-    ControllerMapping mapping = {
-        // Button mappings
-        .buttons = {
-            .key_a = 0x31,           // Space
-            .key_b = 0x08,           // C
-            .key_x = 0x0F,           // R
-            .key_y = 0x03,           // F
-            .key_lb = 0x0C,          // Q
-            .key_rb = 0x0E,          // E
-            .key_ls = 0x38,          // Left Shift
-            .key_rs = 0x3B,          // Left Control
-            .key_view = 0x30,        // Tab
-            .key_menu = 0x35,        // Escape
-            .key_dpad_up = 0x7E,     // Up Arrow
-            .key_dpad_down = 0x7D,   // Down Arrow
-            .key_dpad_left = 0x7B,   // Left Arrow
-            .key_dpad_right = 0x7C   // Right Arrow
-        },
-        
-        // Stick mappings
-        .sticks = {
-            .left_stick_mode = STICK_MODE_WASD,
-            .left_up = 0x0D,         // W
-            .left_down = 0x01,       // S
-            .left_left = 0x00,       // A
-            .left_right = 0x02,      // D
-            
-            .right_stick_mode = STICK_MODE_MOUSE,
-            .right_up = 0x22,        // I (if not in mouse mode)
-            .right_down = 0x28,      // K
-            .right_left = 0x26,      // J
-            .right_right = 0x25,     // L
-            
-            .mouse_sensitivity = 1.5,
-            .mouse_curve = 1.8,
-            .mouse_smoothing = 0.3,
-            .deadzone = 8000
-        },
-        
-        // Trigger mappings
-        .triggers = {
-            .left_trigger_mode = TRIGGER_MODE_MOUSE,
-            .right_trigger_mode = TRIGGER_MODE_MOUSE,
-            .left_trigger_key = 0x06,    // Z
-            .right_trigger_key = 0x07,   // X
-            .threshold = 127
-        },
-        
-        .console_output_enabled = true,
-        .streaming_mode = false
-    };
+    ControllerMapping mapping;
+    
+    /***************************************************************************
+     * BUTTON MAPPINGS
+     * 
+     * Map each Xbox button to a keyboard key.
+     * Change the 0x__ values using the key code reference at the bottom.
+     * 
+     * Example: To make A button = Enter instead of Space:
+     *   Change:  .key_a = 0x31,  (Space)
+     *   To:      .key_a = 0x24,  (Enter)
+     **************************************************************************/
+    
+    mapping.buttons.key_a          = 0x31;  // Space
+    mapping.buttons.key_b          = 0x08;  // C
+    mapping.buttons.key_x          = 0x0F;  // R
+    mapping.buttons.key_y          = 0x03;  // F
+    
+    mapping.buttons.key_lb         = 0x0C;  // Q (Left Bumper)
+    mapping.buttons.key_rb         = 0x0E;  // E (Right Bumper)
+    
+    mapping.buttons.key_ls         = 0x38;  // Left Shift (Left Stick Click)
+    mapping.buttons.key_rs         = 0x3B;  // Left Control (Right Stick Click)
+    
+    mapping.buttons.key_view       = 0x30;  // Tab (View button)
+    mapping.buttons.key_menu       = 0x35;  // Escape (Menu button)
+    
+    mapping.buttons.key_dpad_up    = 0x7E;  // Up Arrow
+    mapping.buttons.key_dpad_down  = 0x7D;  // Down Arrow
+    mapping.buttons.key_dpad_left  = 0x7B;  // Left Arrow
+    mapping.buttons.key_dpad_right = 0x7C;  // Right Arrow
+    
+    
+    /***************************************************************************
+     * LEFT STICK CONFIGURATION
+     * 
+     * Choose behavior mode:
+     *   STICK_MODE_WASD    - Use for movement (W=up, A=left, S=down, D=right)
+     *   STICK_MODE_ARROWS  - Use arrow keys instead
+     *   STICK_MODE_MOUSE   - Move mouse cursor
+     *   STICK_MODE_DISABLED - Turn off left stick
+     * 
+     * If using WASD or ARROWS mode, set the keys below.
+     * If using MOUSE mode, keys are ignored.
+     **************************************************************************/
+    
+    mapping.sticks.left_stick_mode = STICK_MODE_WASD;  // ← CHANGE THIS
+    
+    mapping.sticks.left_up         = 0x0D;  // W
+    mapping.sticks.left_down       = 0x01;  // S
+    mapping.sticks.left_left       = 0x00;  // A
+    mapping.sticks.left_right      = 0x02;  // D
+    
+    
+    /***************************************************************************
+     * RIGHT STICK CONFIGURATION
+     * 
+     * Choose behavior mode (same options as left stick):
+     *   STICK_MODE_MOUSE   - Move mouse cursor (recommended for camera)
+     *   STICK_MODE_WASD    - Use WASD keys
+     *   STICK_MODE_ARROWS  - Use arrow keys
+     *   STICK_MODE_DISABLED - Turn off right stick
+     * 
+     * If using MOUSE mode, adjust sensitivity/smoothing below.
+     **************************************************************************/
+    
+    mapping.sticks.right_stick_mode = STICK_MODE_MOUSE;  // ← CHANGE THIS
+    
+    mapping.sticks.right_up        = 0x22;  // I (only used if not MOUSE mode)
+    mapping.sticks.right_down      = 0x28;  // K
+    mapping.sticks.right_left      = 0x26;  // J
+    mapping.sticks.right_right     = 0x25;  // L
+    
+    
+    /***************************************************************************
+     * MOUSE SETTINGS (for sticks in MOUSE mode)
+     * 
+     * mouse_sensitivity: How fast the cursor moves
+     *   - 0.5 = slow, precise
+     *   - 1.5 = default (balanced)
+     *   - 3.0 = fast
+     * 
+     * mouse_curve: Response curve (makes small movements more precise)
+     *   - 1.0 = linear (no curve)
+     *   - 1.8 = default (recommended)
+     *   - 3.0 = very curved (very precise small movements)
+     * 
+     * mouse_smoothing: How smooth the movement is
+     *   - 0.0 = no smoothing (instant response, may be jittery)
+     *   - 0.3 = default (balanced)
+     *   - 0.8 = very smooth (may feel laggy)
+     **************************************************************************/
+    
+    mapping.sticks.mouse_sensitivity = 1.5;  // ← ADJUST FOR SPEED
+    mapping.sticks.mouse_curve       = 1.8;  // ← ADJUST FOR PRECISION
+    mapping.sticks.mouse_smoothing   = 0.3;  // ← ADJUST FOR SMOOTHNESS
+    
+    
+    /***************************************************************************
+     * DEADZONE (for both sticks)
+     * 
+     * How much you need to move the stick before it registers.
+     * Prevents drift when you leeet go of the stick.
+     * 
+     * Range: 0 to 32767
+     *   - 4000  = small deadzone (~12%)
+     *   - 8000  = default (~24%)
+     *   - 12000 = large deadzone (~36%)
+     **************************************************************************/
+    
+    mapping.sticks.deadzone = 8000;  // ← ADJUST IF STICK DRIFTS
+    
+    
+    /***************************************************************************
+     * TRIGGER CONFIGURATION
+     * 
+     * Choose behavior mode for each trigger:
+     *   TRIGGER_MODE_MOUSE - Act as mouse button (LT=left click, RT=right click)
+     *   TRIGGER_MODE_KEY   - Act as keyboard key (set key below)
+     *   TRIGGER_MODE_DISABLED - Turn off this trigger
+     * 
+     * If using KEY mode, set which keys below.
+     **************************************************************************/
+    
+    mapping.triggers.left_trigger_mode  = TRIGGER_MODE_MOUSE;  // ← CHANGE THIS
+    mapping.triggers.right_trigger_mode = TRIGGER_MODE_MOUSE;  // ← CHANGE THIS
+    
+    mapping.triggers.left_trigger_key   = 0x06;  // Z (only used in KEY mode)
+    mapping.triggers.right_trigger_key  = 0x07;  // X (only used in KEY mode)
+    
+    
+    /***************************************************************************
+     * TRIGGER SENSITIVITY
+     * 
+     * How far you need to pull the trigger before it activates.
+     * 
+     * Range: 0 to 255
+     *   - 64  = very sensitive (25% pull)
+     *   - 127 = default (50% pull)
+     *   - 192 = less sensitive (75% pull)
+     **************************************************************************/
+    
+    mapping.triggers.threshold = 127;  // ← ADJUST SENSITIVITY
+    
+    
+    /***************************************************************************
+     * ADVANCED SETTINGS
+     * 
+     * console_output_enabled: Show controller input in terminal?
+     *   - true  = See button presses and stick values (good for testing)
+     *   - false = Clean output (better for actual gaming)
+     * 
+     * streaming_mode: Optimize for game streaming (Moonlight/Parsec)?
+     *   - false = Local gaming (default)
+     *   - true  = Streaming mode (use relative mouse movement)
+     **************************************************************************/
+    
+    mapping.console_output_enabled = true;   // ← Set to false to hide debug output
+    mapping.streaming_mode         = false;  // ← Set to true for Moonlight/Parsec
+    
     
     return mapping;
 }
 
-// ============================================================================
-// COMMON KEY CODES REFERENCE
-// ============================================================================
+/*******************************************************************************
+ * ============================================================================
+ *                      📖 KEY CODE REFERENCE 📖
+ * ============================================================================
+ * 
+ * Use these codes in your configuration above.
+ * 
+ * EXAMPLE: To make the A button = Enter key
+ *   Find "Return" below → see it's 0x24
+ *   Change: mapping.buttons.key_a = 0x24;
+ * 
+ ******************************************************************************/
+
+/*------------------------------------------------------------------------------
+  LETTERS (lowercase shown, but produces uppercase when Shift is held)
+------------------------------------------------------------------------------*/
 /*
-Letters:
-  A=0x00  B=0x0B  C=0x08  D=0x02  E=0x0E  F=0x03  G=0x05  H=0x04
-  I=0x22  J=0x26  K=0x28  L=0x25  M=0x2E  N=0x2D  O=0x1F  P=0x23
-  Q=0x0C  R=0x0F  S=0x01  T=0x11  U=0x20  V=0x09  W=0x0D  X=0x07
-  Y=0x10  Z=0x06
+    A = 0x00      J = 0x26      S = 0x01
+    B = 0x0B      K = 0x28      T = 0x11
+    C = 0x08      L = 0x25      U = 0x20
+    D = 0x02      M = 0x2E      V = 0x09
+    E = 0x0E      N = 0x2D      W = 0x0D
+    F = 0x03      O = 0x1F      X = 0x07
+    G = 0x05      P = 0x23      Y = 0x10
+    H = 0x04      Q = 0x0C      Z = 0x06
+    I = 0x22      R = 0x0F
+*/
 
-Numbers:
-  0=0x1D  1=0x12  2=0x13  3=0x14  4=0x15  5=0x17
-  6=0x16  7=0x1A  8=0x1C  9=0x19
+/*------------------------------------------------------------------------------
+  NUMBERS (top row of keyboard)
+------------------------------------------------------------------------------*/
+/*
+    1 = 0x12      6 = 0x16
+    2 = 0x13      7 = 0x1A
+    3 = 0x14      8 = 0x1C
+    4 = 0x15      9 = 0x19
+    5 = 0x17      0 = 0x1D
+*/
 
-Special Keys:
-  Space=0x31       Return=0x24      Tab=0x30         Escape=0x35
-  Delete=0x33      Forward Delete=0x75
-  
-Modifiers:
-  Shift=0x38       Control=0x3B     Option=0x3A      Command=0x37
-  Right Shift=0x3C Right Control=0x3E Right Option=0x3D
+/*------------------------------------------------------------------------------
+  SPECIAL KEYS (commonly used)
+------------------------------------------------------------------------------*/
+/*
+    Space               = 0x31
+    Return (Enter)      = 0x24
+    Tab                 = 0x30
+    Escape              = 0x35
+    Delete (Backspace)  = 0x33
+    Forward Delete      = 0x75
+*/
 
-Arrows:
-  Up=0x7E          Down=0x7D        Left=0x7B        Right=0x7C
+/*------------------------------------------------------------------------------
+  MODIFIER KEYS (Shift, Control, etc.)
+------------------------------------------------------------------------------*/
+/*
+    Left Shift      = 0x38      Right Shift     = 0x3C
+    Left Control    = 0x3B      Right Control   = 0x3E
+    Left Option/Alt = 0x3A      Right Option    = 0x3D
+    Left Command    = 0x37      Right Command   = 0x36
+*/
 
-Function Keys:
-  F1=0x7A   F2=0x78   F3=0x63   F4=0x76   F5=0x60   F6=0x61
-  F7=0x62   F8=0x64   F9=0x65   F10=0x6D  F11=0x67  F12=0x6F
+/*------------------------------------------------------------------------------
+  ARROW KEYS
+------------------------------------------------------------------------------*/
+/*
+    Up Arrow    = 0x7E
+    Down Arrow  = 0x7D
+    Left Arrow  = 0x7B
+    Right Arrow = 0x7C
+*/
+
+/*------------------------------------------------------------------------------
+  FUNCTION KEYS
+------------------------------------------------------------------------------*/
+/*
+    F1  = 0x7A      F7  = 0x62
+    F2  = 0x78      F8  = 0x64
+    F3  = 0x63      F9  = 0x65
+    F4  = 0x76      F10 = 0x6D
+    F5  = 0x60      F11 = 0x67
+    F6  = 0x61      F12 = 0x6F
+*/
+
+/*------------------------------------------------------------------------------
+  PUNCTUATION & SYMBOLS (may require Shift for some symbols)
+------------------------------------------------------------------------------*/
+/*
+    Minus/Underscore   = 0x1B      [  = 0x21
+    Equals/Plus        = 0x18      ]  = 0x1E
+    Left Bracket       = 0x21      \  = 0x2A
+    Right Bracket      = 0x1E      ;  = 0x29
+    Semicolon/Colon    = 0x29      '  = 0x27
+    Quote/Double Quote = 0x27      ,  = 0x2B
+    Backslash/Pipe     = 0x2A      .  = 0x2F
+    Comma/Less Than    = 0x2B      /  = 0x2C
+    Period/Greater Than= 0x2F      `  = 0x32
+    Slash/Question     = 0x2C
+    Grave/Tilde        = 0x32
+*/
+
+/*------------------------------------------------------------------------------
+  NUMPAD (if your keyboard has one)
+------------------------------------------------------------------------------*/
+/*
+    Numpad 0 = 0x52      Numpad 7 = 0x59      Numpad Clear   = 0x47
+    Numpad 1 = 0x53      Numpad 8 = 0x5B      Numpad Equals  = 0x51
+    Numpad 2 = 0x54      Numpad 9 = 0x5C      Numpad Divide  = 0x4B
+    Numpad 3 = 0x55      Numpad . = 0x41      Numpad Multiply= 0x43
+    Numpad 4 = 0x56      Numpad + = 0x45      Numpad Minus   = 0x4E
+    Numpad 5 = 0x57      Numpad - = 0x4E      Numpad Plus    = 0x45
+    Numpad 6 = 0x58      Numpad * = 0x43      Numpad Enter   = 0x4C
+*/
+
+/*------------------------------------------------------------------------------
+  TIPS & TRICKS
+------------------------------------------------------------------------------*/
+/*
+    • Can't find a key? Try it in a text editor and note what appears
+    • Most games recognize standard keys (letters, numbers, Space, Shift)
+    • Arrow keys good for UI navigation
+    • F-keys rarely used in games (safe for custom bindings)
+    • Modifier keys (Shift, Control) useful for ability combinations
+    
+    QUICK PRESETS:
+    • FPS games:     WASD movement, Space jump, Shift sprint, C crouch
+    • MOBA games:    QWER abilities, Space center camera, Tab scoreboard
+    • Racing games:  Arrows steer, Space brake/handbrake
+    • Platformers:   Arrows move, Space jump, Shift dash
 */
 
 #endif // KEYMAPPING_H
